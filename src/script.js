@@ -1,4 +1,7 @@
 let apiKey = "1204dcab8ab0929ce69763471e001916";
+let temperature;
+let feelsLike;
+let temperatureUnit = "C";
 
 function dateFormat(selectedDate) {
   let day = selectedDate.getDay();
@@ -34,25 +37,32 @@ function dateFormat(selectedDate) {
   return result;
 }
 function timeFormat(selectedDate) {
-  let hour = selectedDate.getHours();
-  let minute = selectedDate.getMinutes();
+  let hour = "00" + selectedDate.getHours();
+  hour = hour.substring(hour.length - 2);
+  let minute = "00" + selectedDate.getMinutes();
+  minute = minute.substring(minute.length - 2);
 
   let result = `${hour}:${minute} AM`;
   return result;
 }
 
+function updateTemperatureDegrees() {
+  let feels = document.querySelector("#feels");
+  feels.innerHTML = `Feels like ${feelsLike}`;
+  let temp = document.querySelector("#CurrenTemp");
+  temp.innerHTML = `${temperature}`;
+}
+
 function updateTemperature(apiReturn) {
-  let temperature = Math.round(apiReturn.data.main.temp);
-  let feelsLike = Math.round(apiReturn.data.main.feels_like);
+  temperatureUnit = "C";
+  temperature = Math.round(apiReturn.data.main.temp);
+  feelsLike = Math.round(apiReturn.data.main.feels_like);
   let forecast = apiReturn.data.weather[0].main;
   let cityName = apiReturn.data.name;
   let currentHumidity = apiReturn.data.main.humidity;
   console.log(temperature, feelsLike, forecast, cityName, currentHumidity);
   //
-  let feels = document.querySelector("#feels");
-  feels.innerHTML = `Feels like ${feelsLike} C`;
-  let temp = document.querySelector("#CurrenTemp");
-  temp.innerHTML = `${temperature} C`;
+  updateTemperatureDegrees();
   let condition = document.querySelector("#currentForecast");
   condition.innerHTML = `${forecast}`;
   let city = document.querySelector("#city");
@@ -81,6 +91,33 @@ function getCurrentCity() {
   navigator.geolocation.getCurrentPosition(getCurrentCityWeather);
 }
 
+function farenheitToCelcius(farenheitTemperature) {
+  let celciusTemperature = (farenheitTemperature - 32) * (5 / 9);
+  return Math.round(celciusTemperature);
+}
+function celciusToFarenheit(celciusTemperature) {
+  let farenheitTemperature = celciusTemperature * (9 / 5) + 32;
+  return Math.round(farenheitTemperature);
+}
+
+function setCelsiusUnit() {
+  if (temperatureUnit !== "C" && temperature) {
+    //F->C
+    temperatureUnit = "C";
+    temperature = farenheitToCelcius(temperature);
+    feelsLike = farenheitToCelcius(feelsLike);
+    updateTemperatureDegrees();
+  }
+}
+function setFarenheitUnit() {
+  if (temperatureUnit !== "F" && temperature) {
+    //C->F
+    temperatureUnit = "F";
+    temperature = celciusToFarenheit(temperature);
+    feelsLike = celciusToFarenheit(feelsLike);
+    updateTemperatureDegrees();
+  }
+}
 let today = new Date();
 let dateField = document.querySelector("#date");
 let timeField = document.querySelector("#time");
@@ -96,3 +133,9 @@ searchButton.addEventListener("click", searchCity);
 
 let currentButton = document.querySelector("#currentCity");
 currentButton.addEventListener("click", getCurrentCity);
+
+let farenheitPicker = document.querySelector("#farenheitPicker");
+farenheitPicker.addEventListener("click", setFarenheitUnit);
+
+let celsiusPicker = document.querySelector("#celsiusPicker");
+celsiusPicker.addEventListener("click", setCelsiusUnit);
