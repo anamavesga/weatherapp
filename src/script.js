@@ -53,8 +53,22 @@ function updateTemperatureDegrees() {
   temp.innerHTML = `${temperature}`;
 }
 
+function formatForecast(dayForecast) {
+  return dayForecast.weather[0].main + " " + Math.round(dayForecast.temp.day);
+}
+
 function updateForecast(apiReturn) {
   console.log(apiReturn);
+  let days = apiReturn.data.daily;
+  let forecast1 = document.querySelector("#forecast-1");
+  let forecast2 = document.querySelector("#forecast-2");
+  let forecast3 = document.querySelector("#forecast-3");
+  let forecast4 = document.querySelector("#forecast-4");
+
+  forecast1.innerHTML = formatForecast(apiReturn.data.daily[1]);
+  forecast2.innerHTML = formatForecast(apiReturn.data.daily[2]);
+  forecast3.innerHTML = formatForecast(apiReturn.data.daily[3]);
+  forecast4.innerHTML = formatForecast(apiReturn.data.daily[4]);
 }
 
 function updateTemperature(apiReturn) {
