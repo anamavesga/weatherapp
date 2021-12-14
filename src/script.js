@@ -53,8 +53,14 @@ function updateTemperatureDegrees() {
   temp.innerHTML = `${temperature}`;
 }
 
+function updateForecast(apiReturn) {
+  console.log(apiReturn);
+}
+
 function updateTemperature(apiReturn) {
   temperatureUnit = "C";
+  console.log("previous", apiReturn);
+
   temperature = Math.round(apiReturn.data.main.temp);
   feelsLike = Math.round(apiReturn.data.main.feels_like);
   let forecast = apiReturn.data.weather[0].main;
@@ -76,6 +82,10 @@ function searchCity() {
 
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&appid=${apiKey}&units=metric`;
   axios.get(apiUrl).then(updateTemperature);
+
+  let forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?id=${city.value}&appid=${apiKey}&units=metric&cnt=4`;
+  console.log(forecastUrl);
+  axios.get(forecastUrl).then(updateForecast);
 }
 
 function getCurrentCityWeather(position) {
@@ -83,8 +93,11 @@ function getCurrentCityWeather(position) {
   let longitude = position.coords.longitude;
 
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitud}&lon=${longitude}&appid=${apiKey}&units=metric`;
-
   axios.get(apiUrl).then(updateTemperature);
+
+  let forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitud}&lon=${longitude}&appid=${apiKey}&units=metric&exclude=current,minutely,hourly,alerts`;
+  console.log(forecastUrl);
+  axios.get(forecastUrl).then(updateForecast);
 }
 
 function getCurrentCity() {
