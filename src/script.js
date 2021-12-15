@@ -1,6 +1,14 @@
 let apiKey = "1204dcab8ab0929ce69763471e001916";
 let temperature;
 let feelsLike;
+let forecastIcon1;
+let forecastIcon2;
+let forecastIcon3;
+let forecastIcon4;
+let forecastTemperature1;
+let forecastTemperature2;
+let forecastTemperature3;
+let forecastTemperature4;
 let temperatureUnit = "C";
 
 function dateFormat(selectedDate) {
@@ -56,13 +64,21 @@ function timeFormat(selectedDate) {
 
 function updateTemperatureDegrees() {
   let feels = document.querySelector("#feels");
-  feels.innerHTML = `Feels like ${feelsLike}`;
+  feels.innerHTML = `Feels like ${feelsLike} ${temperatureUnit}`;
   let temp = document.querySelector("#CurrenTemp");
   temp.innerHTML = `${temperature}`;
+  let forecast1 = document.querySelector("#forecast-1");
+  let forecast2 = document.querySelector("#forecast-2");
+  let forecast3 = document.querySelector("#forecast-3");
+  let forecast4 = document.querySelector("#forecast-4");
+
+  forecast1.innerHTML = formatForecast(forecastIcon1, forecastTemperature1);
+  forecast2.innerHTML = formatForecast(forecastIcon2, forecastTemperature2);
+  forecast3.innerHTML = formatForecast(forecastIcon3, forecastTemperature3);
+  forecast4.innerHTML = formatForecast(forecastIcon4, forecastTemperature4);
 }
 
 function forecastIcon(mainweather) {
-  console.log("mainweather", mainweather);
   let icon = "";
   if ("clouds".toUpperCase() === mainweather.toUpperCase()) {
     icon = "⛅";
@@ -73,42 +89,51 @@ function forecastIcon(mainweather) {
   } else {
     icon = "🌞";
   }
-  console.log("icon", icon);
   return icon;
 }
 
-function formatForecast(dayForecast) {
-  return (
-    forecastIcon(dayForecast.weather[0].main) +
-    " " +
-    Math.round(dayForecast.temp.day)
-  );
+function formatForecast(icon, temperature) {
+  if (icon && temperature) {
+    return icon + " " + temperature + " " + temperatureUnit;
+  } else {
+    return "";
+  }
 }
 
 function updateForecast(apiReturn) {
-  console.log(apiReturn);
   let days = apiReturn.data.daily;
-  let forecast1 = document.querySelector("#forecast-1");
-  let forecast2 = document.querySelector("#forecast-2");
-  let forecast3 = document.querySelector("#forecast-3");
-  let forecast4 = document.querySelector("#forecast-4");
 
-  forecast1.innerHTML = formatForecast(apiReturn.data.daily[1]);
-  forecast2.innerHTML = formatForecast(apiReturn.data.daily[2]);
-  forecast3.innerHTML = formatForecast(apiReturn.data.daily[3]);
-  forecast4.innerHTML = formatForecast(apiReturn.data.daily[4]);
+  console.log("das", days[1]);
+  forecastIcon1 = forecastIcon(days[1].weather[0].main);
+  forecastIcon2 = forecastIcon(days[2].weather[0].main);
+  forecastIcon3 = forecastIcon(days[3].weather[0].main);
+  forecastIcon4 = forecastIcon(days[4].weather[0].main);
+
+  console.log(forecastIcon1);
+
+  forecastTemperature1 = Math.round(days[1].temp.day);
+  forecastTemperature2 = Math.round(days[2].temp.day);
+  forecastTemperature3 = Math.round(days[3].temp.day);
+  forecastTemperature4 = Math.round(days[4].temp.day);
+
+  updateTemperatureDegrees();
 }
 
 function updateTemperature(apiReturn) {
   temperatureUnit = "C";
   console.log("previous", apiReturn);
 
+  let latitud = apiReturn.data.coord.lat;
+  let longitude = apiReturn.data.coord.lon;
+
+  let forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitud}&lon=${longitude}&appid=${apiKey}&units=metric&exclude=current,minutely,hourly,alerts`;
+  axios.get(forecastUrl).then(updateForecast);
+
   temperature = Math.round(apiReturn.data.main.temp);
   feelsLike = Math.round(apiReturn.data.main.feels_like);
   let forecast = apiReturn.data.weather[0].main;
   let cityName = apiReturn.data.name;
   let currentHumidity = apiReturn.data.main.humidity;
-  console.log(temperature, feelsLike, forecast, cityName, currentHumidity);
   //
   updateTemperatureDegrees();
   let condition = document.querySelector("#currentForecast");
@@ -124,10 +149,6 @@ function searchCity() {
 
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&appid=${apiKey}&units=metric`;
   axios.get(apiUrl).then(updateTemperature);
-
-  let forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?id=${city.value}&appid=${apiKey}&units=metric&cnt=4`;
-  console.log(forecastUrl);
-  axios.get(forecastUrl).then(updateForecast);
 }
 
 function getCurrentCityWeather(position) {
@@ -136,10 +157,6 @@ function getCurrentCityWeather(position) {
 
   let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitud}&lon=${longitude}&appid=${apiKey}&units=metric`;
   axios.get(apiUrl).then(updateTemperature);
-
-  let forecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitud}&lon=${longitude}&appid=${apiKey}&units=metric&exclude=current,minutely,hourly,alerts`;
-  console.log(forecastUrl);
-  axios.get(forecastUrl).then(updateForecast);
 }
 
 function getCurrentCity() {
@@ -161,6 +178,10 @@ function setCelsiusUnit() {
     temperatureUnit = "C";
     temperature = farenheitToCelcius(temperature);
     feelsLike = farenheitToCelcius(feelsLike);
+    forecastTemperature1 = farenheitToCelcius(forecastTemperature1);
+    forecastTemperature2 = farenheitToCelcius(forecastTemperature2);
+    forecastTemperature3 = farenheitToCelcius(forecastTemperature3);
+    forecastTemperature4 = farenheitToCelcius(forecastTemperature4);
     updateTemperatureDegrees();
   }
 }
@@ -170,6 +191,10 @@ function setFarenheitUnit() {
     temperatureUnit = "F";
     temperature = celciusToFarenheit(temperature);
     feelsLike = celciusToFarenheit(feelsLike);
+    forecastTemperature1 = celciusToFarenheit(forecastTemperature1);
+    forecastTemperature2 = celciusToFarenheit(forecastTemperature2);
+    forecastTemperature3 = celciusToFarenheit(forecastTemperature3);
+    forecastTemperature4 = celciusToFarenheit(forecastTemperature4);
     updateTemperatureDegrees();
   }
 }
