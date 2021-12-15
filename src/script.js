@@ -34,6 +34,14 @@ function dateFormat(selectedDate) {
   ];
 
   let result = `${days[day]} ${date} ${months[month]} ${year}`;
+  document.querySelector("#forecast-day-1").innerHTML =
+    days[(day + 1) % days.length];
+  document.querySelector("#forecast-day-2").innerHTML =
+    days[(day + 2) % days.length];
+  document.querySelector("#forecast-day-3").innerHTML =
+    days[(day + 3) % days.length];
+  document.querySelector("#forecast-day-4").innerHTML =
+    days[(day + 4) % days.length];
   return result;
 }
 function timeFormat(selectedDate) {
