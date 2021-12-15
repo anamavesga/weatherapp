@@ -53,8 +53,28 @@ function updateTemperatureDegrees() {
   temp.innerHTML = `${temperature}`;
 }
 
+function forecastIcon(mainweather) {
+  console.log("mainweather", mainweather);
+  let icon = "";
+  if ("clouds".toUpperCase() === mainweather.toUpperCase()) {
+    icon = "⛅";
+  } else if ("snow".toUpperCase() === mainweather.toUpperCase()) {
+    icon = "☃️";
+  } else if ("rain".toUpperCase() === mainweather.toUpperCase()) {
+    icon = "🌧️";
+  } else {
+    icon = "🌞";
+  }
+  console.log("icon", icon);
+  return icon;
+}
+
 function formatForecast(dayForecast) {
-  return dayForecast.weather[0].main + " " + Math.round(dayForecast.temp.day);
+  return (
+    forecastIcon(dayForecast.weather[0].main) +
+    " " +
+    Math.round(dayForecast.temp.day)
+  );
 }
 
 function updateForecast(apiReturn) {
