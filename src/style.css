@@ -75,3 +75,11 @@ footer {
   max-width: 800px;
   margin: auto;
 }
+#farenheitPicker {
+  color: #c8d5b9;
+  font-size: 50px;
+}
+#celsiusPicker {
+  color: #c8d5b9;
+  font-size: 50px;
+}
